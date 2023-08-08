@@ -1,17 +1,20 @@
 import { Component, OnInit } from '@angular/core';
-import { Router,NavigationExtras } from '@angular/router';
+import { Router, NavigationExtras } from '@angular/router';
 import { faTrash, faPlus, faPenSquare } from '@fortawesome/free-solid-svg-icons';
 import {AppServiceService} from '../../app-service.service';
+
 @Component({
   selector: 'app-student-table',
   templateUrl: './student-table.component.html',
   styleUrls: ['./student-table.component.css']
 })
+
 export class StudentTableComponent implements OnInit {
 
   faTrash = faTrash;
-  faPlus = faPlus;
+  faPlus = faPlus; 
   faPenSquare = faPenSquare;
+
   studentData: any;
   selected: any;
 
@@ -19,7 +22,7 @@ export class StudentTableComponent implements OnInit {
 
   ngOnInit(): void {
     this.getStudentData();
-  }
+  }  
 
   addNewStudent(){
     this.router.navigate(['addStudent'])
@@ -28,7 +31,7 @@ export class StudentTableComponent implements OnInit {
   editStudent(id){
     const navigationExtras: NavigationExtras = {
       state: {
-        id : id
+        id : id  
       }
     };
     this.router.navigate(['editStudent'], navigationExtras )
@@ -52,16 +55,19 @@ export class StudentTableComponent implements OnInit {
   }
 
   search(value) {
-    let foundItems = [];
+    let filteredStudents = [];
+    
     if (value.length <= 0) {
       this.getStudentData();
     } else {
-      let b = this.studentData.filter((student) => {
-        if (student[0].name.toLowerCase().indexOf(value) > -1) {
-          foundItems.push(student)
-        }
+      this.studentData.forEach(student => {
+        if (student[0].name.toLowerCase().includes(value.toLowerCase())) {
+          filteredStudents.push(student);
+        }  
       });
-      this.studentData = foundItems;
+      
+      this.studentData = filteredStudents;
     }
   }
+
 }
