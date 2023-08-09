@@ -1,141 +1,88 @@
-const dbConnection = require("./sqlite");
+const db = require("./sqlite"); 
 
-dbConnection
-  .getDbConnection()
-  .then((db) => {
-    init(db);
-  })
-  .catch((err) => {
-    console.log(err);
-    throw err;
-  });
+db.connect()
+  .then(initializedDb)
+  .catch(handleError);
 
-let _db;
+let database;
 
-function init(db) {
-    _db = db;
+function initializedDb(dbInstance) {
+  database = dbInstance;
 }
 
-const knex_db = require("./db-config");
+const queryBuilder = require("./db-config");
 
-const dbinitialize = async () => {
-    testBase.resetDatabase(knex_db);
+// Teacher operations
+
+const getTeachers = () => {
+  const sql = `SELECT * FROM teachers`;
+  return executeSql(sql);
 }
 
-const readTeachers = async () => {
-    const sql = `SELECT * FROM dummyData`
-    return new Promise((resolve, reject) => {
-        knex_db
-            .raw(sql)
-            .then((data) => {
-                resolve(data);
-            })
-            .catch((error) => {
-                reject(error);
-            });
-    });
+const getTeacherById = (id) => {
+  const sql = `SELECT * FROM teachers WHERE id = ?`;
+  return executeSql(sql, [id]);
 }
 
-const readTeacherInfo = async (id) => {
-    const sql = `SELECT * FROM dummyData`
-    return new Promise((resolve, reject) => {
-        knex_db
-            .raw(sql)
-            .then((data) => {
-                resolve(data);
-            })
-            .catch((error) => {
-                reject(error);
-            });
-    });
+const createTeacher = (id, name, age) => {
+  const sql = `INSERT INTO teachers VALUES (?, ?, ?)`; 
+  return executeSql(sql, [id, name, age]); 
 }
 
-const addTeacher = async (id, name, age) => {
-    const sql = `SELECT * FROM dummyData`
-    return new Promise((resolve, reject) => {
-        knex_db
-            .raw(sql)
-            .then((data) => {
-                resolve(data);
-            })
-            .catch((error) => {
-                reject(error);
-            });
-    });
+const updateTeacher = (name, age, id) => {
+  const sql = `UPDATE teachers SET name = ?, age = ? WHERE id = ?`;
+  return executeSql(sql, [name, age, id]);
 }
 
-const updateTeacher = async (name, age, id) => {
-    const sql = `SELECT * FROM dummyData`
-    return new Promise((resolve, reject) => {
-        knex_db
-            .raw(sql)
-            .then((data) => {
-                resolve(data);
-            })
-            .catch((error) => {
-                reject(error);
-            });
-    });
+const deleteTeacher = (id) => {
+  const sql = `DELETE FROM teachers WHERE id = ?`;
+  return executeSql(sql, [id]);
 }
 
-const deleteTeacher = async (id) => {
-    const sql = `SELECT * FROM dummyData`
-    return new Promise((resolve, reject) => {
-        knex_db
-            .raw(sql)
-            .then((data) => {
-                resolve(data);
-            })
-            .catch((error) => {
-                reject(error);
-            });
-    });
-}
 
-const readStudents = async () => {
+// Student operations  
+
+const getStudents = () => {
   const sql = `SELECT * FROM students`;
-  
-  return knex_db.raw(sql);
+  return executeSql(sql);
 }
 
-const readStudentInfo = async (id) => {
+const getStudentById = (id) => {
   const sql = `SELECT * FROM students WHERE id = ?`;
-  
-  return knex_db.raw(sql, [id]);
-} 
-
-const addStudent = async (id, name, age, religion) => {
-  const sql = `INSERT INTO students(id, name, age, religion) VALUES (?, ?, ?, ?)`;
-  
-  return knex_db.raw(sql, [id, name, age, religion]);
+  return executeSql(sql, [id]);
 }
 
-const updateStudent = async (name, age, religion, id) => {
-  const sql = `UPDATE students SET name = ?, age = ?, religion = ? WHERE id = ?`;
-  
-  return knex_db.raw(sql, [name, age, religion, id]);
+const createStudent = (id, name, age, hometown) => {
+  const sql = `INSERT INTO students VALUES (?, ?, ?, ?)`;
+  return executeSql(sql, [id, name, age, hometown]);
 }
 
-const deleteStudent = async (id) => {
-  const sql = `DELETE FROM students WHERE id = ?`;
-  
-  return knex_db.raw(sql, [id]); 
+const updateStudent = (name, age, hometown, id) => {
+  const sql = `UPDATE students SET name = ?, age = ?, hometown = ? WHERE id = ?`;
+  return executeSql(sql, [name, age, hometown, id]);
+}
+
+const deleteStudent = (id) => {
+  const sql = `DELETE FROM students WHERE id = ?`; 
+  return executeSql(sql, [id]);
+}
+
+
+// Helper method to execute SQL
+function executeSql(sql, params=[]) {
+  return queryBuilder.raw(sql, params);
 }
 
 module.exports = {
-
-  // Teacher functions
-  readTeachers,
-  readTeacherInfo,
-  addTeacher,
+  getTeachers,
+  getTeacherById,
+  createTeacher,
   updateTeacher,
   deleteTeacher,
-
-  // Student functions
-  readStudents, 
-  readStudentInfo,
-  addStudent,
+  
+  getStudents,
+  getStudentById,
+  createStudent,
   updateStudent,
   deleteStudent
-
-};
+}
