@@ -62,32 +62,7 @@ async function deleteTeacher(id) {
     }
 }
 
-const readStudents = async () => {
-    const sql = `SELECT * FROM student`;
-    return knexQuery(sql);
-};
-
-const readStudentInfo = async (id) => {
-    const sql = `SELECT * FROM student WHERE id = ?`;
-    return knexQuery(sql, [id]);
-};
-
-const addStudent = async (id, name, age, hometown) => {
-    const sql = `INSERT INTO student(id, name, age, hometown) VALUES (?, ?, ?, ?)`;
-    return knexExecute(sql, [id, name, age, hometown]);
-};
-
-const updateStudent = async (name, age, id, hometown) => {
-    const sql = `UPDATE student SET name = ?, age = ?, hometown = ? WHERE id = ?`;
-    return knexExecute(sql, [name, age, hometown, id]);
-};
-
-const deleteStudent = async (id) => {
-    const sql = `DELETE FROM student WHERE id = ?`;
-    return knexExecute(sql, [id]);
-};
-
-const knexQuery = async (sql, params = []) => {
+const executeQuery = async (sql, params = []) => {
     try {
         const result = await knex_db.raw(sql, params);
         return result;
@@ -96,13 +71,32 @@ const knexQuery = async (sql, params = []) => {
     }
 };
 
-const knexExecute = async (sql, params = []) => {
-    try {
-        await knex_db.raw(sql, params);
-        return { status: "Success" };
-    } catch (error) {
-        throw error;
-    }
+const readStudents = async () => {
+    const sql = `SELECT * FROM student`;
+    return executeQuery(sql);
+};
+
+const readStudentInfo = async (id) => {
+    const sql = `SELECT * FROM student WHERE id = ?`;
+    return executeQuery(sql, [id]);
+};
+
+const addStudent = async (id, name, age, hometown) => {
+    const sql = `INSERT INTO student(id,name,age,hometown) VALUES (?,?,?,?)`;
+    await executeQuery(sql, [id, name, age, hometown]);
+    return { status: "Successfully inserted Student" };
+};
+
+const updateStudent = async (name, age, id, hometown) => {
+    const sql = `UPDATE student SET name=?, age=?, hometown=? WHERE id=?`;
+    await executeQuery(sql, [name, age, hometown, id]);
+    return { status: "Successfully updated Student" };
+};
+
+const deleteStudent = async (id) => {
+    const sql = `DELETE FROM student WHERE id = ?`;
+    await executeQuery(sql, [id]);
+    return { status: "Successfully deleted Student" };
 };
 
 module.exports = {
