@@ -62,55 +62,45 @@ async function deleteTeacher(id) {
     }
 }
 
-async function readStudents() {
-    const sql = `SELECT * FROM student`;
-    try {
-        const student = await knex_db.raw(sql);
-        return student;
-    } catch (error) {
-        throw error;
-    }
-}
+const readStudents = () => {
+  return knex_db('student').then(students => {
+    return students;
+  }).catch(error => {
+    throw error;
+  });
+};
 
-async function readStudentInfo(id) {
-    const sql = `SELECT * FROM student WHERE id = ?`;
-    try {
-        const student = await knex_db.raw(sql, [id]);
-        return student;
-    } catch (error) {
-        throw error;
-    }
-}
+const readStudentInfo = id => {
+  return knex_db('student').where({id}).then(([student]) => {
+    return student;
+  }).catch(error => {
+    throw error;
+  });
+};
 
-async function addStudent(id, name, age, hometown) {
-    const sql = `INSERT INTO student(id, name, age, hometown) VALUES (?, ?, ?, ?)`;
-    try {
-        await knex_db.raw(sql, [id, name, age, hometown]);
-        return { status: "Successfully inserted Student" };
-    } catch (error) {
-        throw error;
-    }
-}
+const addStudent = (id, name, age, hometown) => {
+  return knex_db('student').insert({id, name, age, hometown}).then(() => {
+    return {status: 'Successfully inserted Student'};
+  }).catch(error => {
+    throw error;
+  });
+};
 
-async function updateStudent(name, age, id, hometown) {
-    const sql = `UPDATE student SET name=?, age=?, hometown=? WHERE id=?`;
-    try {
-        await knex_db.raw(sql, [name, age, hometown, id]);
-        return { status: "Successfully updated Student" };
-    } catch (error) {
-        throw error;
-    }
-}
+const updateStudent = (id, name, age, hometown) => {
+  return knex_db('student').where({id}).update({name, age, hometown}).then(() => {
+    return {status: 'Successfully updated Student'};
+  }).catch(error => {
+    throw error;
+  });
+};
 
-async function deleteStudent(id) {
-    const sql = `DELETE FROM student WHERE id = ?`;
-    try {
-        await knex_db.raw(sql, [id]);
-        return { status: "Successfully deleted Student" };
-    } catch (error) {
-        throw error;
-    }
-}
+const deleteStudent = id => {
+  return knex_db('student').where({id}).del().then(() => {
+    return {status: 'Successfully deleted Student'};
+  }).catch(error => {
+    throw error;
+  });
+};
 
 module.exports = {
     readTeachers,
