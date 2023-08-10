@@ -120,46 +120,47 @@ const readStudentInfo = async (id) => {
   });
 };
 
+const readStudents = async () => {
+  const sql = `SELECT * FROM student`;
+  return knexQuery(sql);
+};
+
+const readStudentInfo = async (id) => {
+  const sql = `SELECT * FROM student WHERE id = ?`;
+  return knexQuery(sql, [id]);
+};
+
 const addStudent = async (id, name, age, hometown) => {
-  return new Promise((resolve, reject) => {
-    const sql = `INSERT INTO student(id, name, age, hometown) VALUES (?, ?, ?, ?)`;
-    knex_db
-      .raw(sql, [id, name, age, hometown])
-      .then(() => {
-        resolve({ status: "Successfully inserted Student" });
-      })
-      .catch((error) => {
-        reject(error);
-      });
-  });
+  const sql = `INSERT INTO student(id, name, age, hometown) VALUES (?, ?, ?, ?)`;
+  return knexExecute(sql, [id, name, age, hometown]);
 };
 
 const updateStudent = async (name, age, id, hometown) => {
-  return new Promise((resolve, reject) => {
-    const sql = `UPDATE student SET name=?, age=?, hometown=? WHERE id=?`;
-    knex_db
-      .raw(sql, [name, age, hometown, id])
-      .then(() => {
-        resolve({ status: "Successfully updated Student" });
-      })
-      .catch((error) => {
-        reject(error);
-      });
-  });
+  const sql = `UPDATE student SET name = ?, age = ?, hometown = ? WHERE id = ?`;
+  return knexExecute(sql, [name, age, hometown, id]);
 };
 
 const deleteStudent = async (id) => {
-  return new Promise((resolve, reject) => {
-    const sql = `DELETE FROM student WHERE id = ?`;
-    knex_db
-      .raw(sql, [id])
-      .then(() => {
-        resolve({ status: "Successfully deleted Student" });
-      })
-      .catch((error) => {
-        reject(error);
-      });
-  });
+  const sql = `DELETE FROM student WHERE id = ?`;
+  return knexExecute(sql, [id]);
+};
+
+const knexQuery = async (sql, params = []) => {
+  try {
+      const result = await knex_db.raw(sql, params);
+      return result;
+  } catch (error) {
+      throw error;
+  }
+};
+
+const knexExecute = async (sql, params = []) => {
+  try {
+      await knex_db.raw(sql, params);
+      return { status: "Success" };
+  } catch (error) {
+      throw error;
+  }
 };
 
 module.exports = {
